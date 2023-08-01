@@ -218,11 +218,20 @@ func (ep *Peer) blockLoop() {
 				break
 			}
 
+			fmt.Printf(
+				"newBlockNumber: %v, confirmedHead: %v, height: %v, sentHead: %v\n",
+				newBlockNumber,
+				ep.confirmedHead.hash,
+				ep.confirmedHead.height,
+				ep.sentHead.height,
+			)
+
 			// release next block if ready
-			nextBlock := newBlockNumber == ep.confirmedHead.height+1 && newBlock.Block.ParentHash() == ep.confirmedHead.hash
-			initialBlock := ep.confirmedHead.height == 0 && ep.sentHead.height == 0 && newBlock.Block.ParentHash() == ep.confirmedHead.hash
-			if nextBlock || initialBlock {
+			// nextBlock := newBlockNumber == ep.confirmedHead.height+1 && newBlock.Block.ParentHash() == ep.confirmedHead.hash
+			// initialBlock := ep.confirmedHead.height == 0 && ep.sentHead.height == 0 && newBlock.Block.ParentHash() == ep.confirmedHead.hash
+			if true {
 				ep.Log().Debugf("queued block %v at height %v is next expected (%v), sending immediately", newBlockHash, newBlockNumber, ep.confirmedHead.height+1)
+				fmt.Println("sending new block")
 				err := ep.sendNewBlock(newBlock)
 				if err != nil {
 					ep.Log().Errorf("could not send block %v to peer %v: %v", newBlockHash, ep, err)
@@ -240,6 +249,7 @@ func (ep *Peer) blockLoop() {
 					}
 				}
 
+				fmt.Println("inserting new block")
 				ep.Log().Debugf("queuing block %v at height %v behind %v blocks", newBlockHash, newBlockNumber, insertionPoint)
 
 				// insert block at insertion point
